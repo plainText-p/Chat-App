@@ -54,7 +54,8 @@ export default function Home() {
       <div className="w-full max-w-md mt-4 mode-fg rounded-xl shadow-lg p-4 flex flex-col">
         <div className="flex-1 overflow-y-auto mb-4 h-96 border border-indigo-300 rounded-lg p-2">
           {messages.map((msg, i) => (
-            <p key={i} className="mb-2">
+            <p key={i} className="mb-2 mode-color" >
+            
               <strong>{msg.user}:</strong> {msg.text}
             </p>
           ))}
