@@ -9,13 +9,14 @@ import {
   onSnapshot,
   addDoc,
   serverTimestamp,
+  Timestamp,
 } from "firebase/firestore";
 
 // 🧩 Definimos el tipo Message
 type Message = {
   user: string;
   text: string;
-  createdAt?: any;
+  createdAt?: Timestamp;
 };
 
 export default function Home() {
