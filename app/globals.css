@@ -1,15 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #5e6eff;
+  --foreground: #ffffff;
+  --mode-1: #11018c;
+  --mode-2: #1525b6;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #3805ad;
+    --foreground: #11018c;
+    --mode-1: #f7f7f7;
+    --mode-2: #6234ce;
   }
+}
+.mode-fg {
+  background: var(--foreground);
+}
+.mode-color{
+    color: var(--mode-1);
+}
+.mode-bg{
+    background: var(--background);
+}
+.mode-bg-hover:hover{
+    background-color: var(--mode-2);
 }
 
 body {
