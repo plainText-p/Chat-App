@@ -2,7 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { db } from "../../lib/firebaseConfig";
-import { collection, query, orderBy, onSnapshot, Timestamp} from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  Timestamp,
+} from "firebase/firestore";
 import { useAuth } from "../../../context/AuthContext";
 
 interface Message {
@@ -17,27 +23,38 @@ interface Message {
 export default function MessageList() {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const q = query(
-      collection(db, "messages"), 
-      orderBy("createdAt", "asc")
-    );
+    const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const messagesData: Message[] = [];
       querySnapshot.forEach((doc) => {
         messagesData.push({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         } as Message);
       });
       setMessages(messagesData);
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
-
+  if (loading) {
+    return (
+      <div className="h-full overflow-y-auto p-4 mode-bg flex items-center justify-center">
+        <div className="text-center">
+          <div className="flex justify-center space-x-2 mb-4">
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+          </div>
+          <p className="mode-color text-sm">Cargando mensajes...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="h-full overflow-y-auto p-4 mode-bg">
       {messages.length === 0 ? (
@@ -48,38 +65,44 @@ export default function MessageList() {
         <div className="space-y-4">
           {messages.map((message) => {
             const isOwnMessage = message.userId === user?.uid;
-            
+
             return (
               <div
                 key={message.id}
-                className={`flex flex-col ${isOwnMessage ? 'items-end' : 'items-start'}`}
+                className={`flex flex-col ${
+                  isOwnMessage ? "items-end" : "items-start"
+                }`}
               >
                 {/* Encabezado con el nombre del usuario */}
                 <div className="mb-1 px-2">
-                  <div className={`text-sm font-semibold px-3 py-1 rounded-t-lg  ${
-                    isOwnMessage 
-                      ? 'mode-color' 
-                      : 'mode-color '
-                  }`}>
-                    {isOwnMessage ? 'Tú' : message.userName}
+                  <div
+                    className={`text-sm font-semibold px-3 py-1 rounded-t-lg  ${
+                      isOwnMessage ? "mode-color" : "mode-color "
+                    }`}
+                  >
+                    {isOwnMessage ? "Tú" : message.userName}
                   </div>
                 </div>
 
                 {/* Burbuja del mensaje */}
-                <div className={`px-4 py-3 rounded-lg max-w-xs lg:max-w-md ${
-                  isOwnMessage
-                    ? 'mode-fg mode-color rounded-tr-none  '
-                    : 'mode-fg mode-color rounded-tl-none  '
-                }`}>
+                <div
+                  className={`px-4 py-3 rounded-lg max-w-xs lg:max-w-md ${
+                    isOwnMessage
+                      ? "mode-fg mode-color rounded-tr-none  "
+                      : "mode-fg mode-color rounded-tl-none  "
+                  }`}
+                >
                   <div className="text-sm">{message.text}</div>
-                  
-                  <div className={`text-xs mt-2 ${
-                    isOwnMessage ? 'text-gray-500' : 'text-gray-500'
-                  }`}>
-                    {message.createdAt?.toDate?.().toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    }) || 'Enviando...'}
+
+                  <div
+                    className={`text-xs mt-2 ${
+                      isOwnMessage ? "text-gray-500" : "text-gray-500"
+                    }`}
+                  >
+                    {message.createdAt?.toDate?.().toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }) || "Enviando..."}
                   </div>
                 </div>
               </div>

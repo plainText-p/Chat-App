@@ -10,8 +10,15 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div>Cargando...</div>
+      <div className="fixed inset-0 mode-bg flex items-center justify-center z-50">
+        <div className="text-center">
+          <div className="flex justify-center space-x-2 mb-4">
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+          </div>
+          <p className="mode-color text-sm">Cargando mensajes...</p>
+        </div>
       </div>
     );
   }
@@ -21,7 +28,7 @@ export default function Home() {
   }
 
   return (
-    <div >     
+    <div>
       <ChatContainer />
     </div>
   );
