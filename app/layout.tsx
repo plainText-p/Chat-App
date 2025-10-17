@@ -1,22 +1,25 @@
-import type { Metadata } from 'next'
-import './globals.css'
+import type { Metadata } from "next";
+import { AuthProvider } from "../context/AuthContext";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'Chat App',
-  description: 'Chat application',
+  title: "Chat App",
+  description: "Chat application with Next.Js and Firebase",
   icons: {
-    icon: '/favicon.ico',  // ✅ Esto apunta a /public/favicon.ico
+    icon: "/favicon.ico",
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <AuthProvider> {children}</AuthProvider>
+      </body>
     </html>
-  )
+  );
 }
