@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  signInWithEmailAndPassword, 
+import {
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  updateProfile 
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../../lib/firebaseConfig";
 import { useAuth } from "../../../context/AuthContext";
@@ -19,60 +19,76 @@ const LoginForm = () => {
   const { refreshUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      console.log('🔐 Intentando autenticar...', { email, username, isLogin });
-      
-      if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
-        console.log('✅ Login exitoso');
-      } else {
-        // Registro con nombre de usuario
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        
-        // Actualizar el perfil con el nombre de usuario
-        if (username.trim()) {
-          await updateProfile(userCredential.user, {
-            displayName: username.trim()
-          });
-          // Forzar actualización del contexto
-          await refreshUser();
-        }
-        
-        console.log('✅ Registro exitoso - Nombre:', userCredential.user.displayName);
+  try {
+    console.log("🔐 Intentando autenticar...", { email, username, isLogin });
+
+    if (isLogin) {
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("✅ Login exitoso");
+    } else {
+      // Registro con nombre de usuario
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // Actualizar el perfil con el nombre de usuario
+      if (username.trim()) {
+        await updateProfile(userCredential.user, {
+          displayName: username.trim(),
+        });
+        // Forzar actualización del contexto
+        await refreshUser();
       }
-    } catch (error: any) {
-      console.error('❌ Error de autenticación:', error);
+
+      console.log(
+        "✅ Registro exitoso - Nombre:",
+        userCredential.user.displayName
+      );
+    }
+  } catch (error: unknown) {
+    console.error("❌ Error de autenticación:", error);
+
+    let errorMessage = "Error desconocido";
+
+    if (error instanceof Error) {
+      const firebaseError = error as { code?: string; message: string };
       
-      switch (error.code) {
-        case 'auth/configuration-not-found':
-          setError('Error de configuración de Firebase. Verifica la consola de Firebase.');
+      switch (firebaseError.code) {
+        case "auth/configuration-not-found":
+          errorMessage = "Error de configuración de Firebase. Verifica la consola de Firebase.";
           break;
-        case 'auth/email-already-in-use':
-          setError('Este email ya está registrado.');
+        case "auth/email-already-in-use":
+          errorMessage = "Este email ya está registrado.";
           break;
-        case 'auth/invalid-email':
-          setError('El formato del email es inválido.');
+        case "auth/invalid-email":
+          errorMessage = "El formato del email es inválido.";
           break;
-        case 'auth/weak-password':
-          setError('La contraseña debe tener al menos 6 caracteres.');
+        case "auth/weak-password":
+          errorMessage = "La contraseña debe tener al menos 6 caracteres.";
           break;
-        case 'auth/user-not-found':
-          setError('No existe una cuenta con este email.');
+        case "auth/user-not-found":
+          errorMessage = "No existe una cuenta con este email.";
           break;
-        case 'auth/wrong-password':
-          setError('Contraseña incorrecta.');
+        case "auth/wrong-password":
+          errorMessage = "Contraseña incorrecta.";
           break;
         default:
-          setError(`Error: ${error.message}`);
+          errorMessage = `Error: ${firebaseError.message}`;
       }
-    } finally {
-      setLoading(false);
     }
-  };
+    
+    // Fuera del switch, asignar el errorMessage a setError
+    setError(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center mode-bg">
@@ -85,12 +101,15 @@ const LoginForm = () => {
             {isLogin ? "Accede a tu cuenta" : "Crea una nueva cuenta"}
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {/* Campo de nombre de usuario solo para registro */}
           {!isLogin && (
             <div>
-              <label htmlFor="username" className="block text-sm font-medium mode-color">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium mode-color"
+              >
                 Nombre de usuario *
               </label>
               <input
@@ -105,12 +124,17 @@ const LoginForm = () => {
                 minLength={2}
                 maxLength={20}
               />
-              <p className="mt-1 text-xs mode-color">Este será tu nombre visible en el chat</p>
+              <p className="mt-1 text-xs mode-color">
+                Este será tu nombre visible en el chat
+              </p>
             </div>
           )}
-          
+
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mode-color">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium mode-color"
+            >
               Email *
             </label>
             <input
@@ -124,9 +148,12 @@ const LoginForm = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          
+
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mode-color">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium mode-color"
+            >
               Contraseña *
             </label>
             <input
@@ -155,14 +182,32 @@ const LoginForm = () => {
           >
             {loading ? (
               <span className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Procesando...
               </span>
+            ) : isLogin ? (
+              "Iniciar sesión"
             ) : (
-              isLogin ? "Iniciar sesión" : "Crear cuenta"
+              "Crear cuenta"
             )}
           </button>
 
@@ -176,8 +221,8 @@ const LoginForm = () => {
               }}
               className="mode-color hover:text-blue-500 text-sm transition duration-200"
             >
-              {isLogin 
-                ? "¿No tienes cuenta? Regístrate aquí" 
+              {isLogin
+                ? "¿No tienes cuenta? Regístrate aquí"
                 : "¿Ya tienes cuenta? Inicia sesión aquí"}
             </button>
           </div>

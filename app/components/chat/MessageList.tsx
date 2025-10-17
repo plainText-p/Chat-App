@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { db } from "../../lib/firebaseConfig";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, Timestamp} from "firebase/firestore";
 import { useAuth } from "../../../context/AuthContext";
 
 interface Message {
@@ -11,7 +11,7 @@ interface Message {
   userId: string;
   userEmail: string;
   userName: string;
-  createdAt: any;
+  createdAt: Timestamp;
 }
 
 export default function MessageList() {

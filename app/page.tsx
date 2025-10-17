@@ -3,7 +3,6 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 import ChatContainer from "./components/chat/ChatContainer";
-import Navbar from "./components/ui/Navbar";
 import LoginForm from "./components/auth/LoginForm";
 
 export default function Home() {
